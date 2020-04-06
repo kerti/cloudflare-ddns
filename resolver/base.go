@@ -39,7 +39,7 @@ var (
 		ResolverMyExternalIP:      "https://myexternalip.com/raw",
 		ResolverMyIP:              "https://api.myip.com",
 		ResolverWhatIsMyIPAddress: "http://ipv4bot.whatismyipaddress.com",
-		ResolverWtfIsMyIP:         "https://wtfismyip.com",
+		ResolverWtfIsMyIP:         "https://wtfismyip.com/text",
 	}
 )
 
@@ -62,7 +62,7 @@ func Get(key string) (*Resolver, error) {
 	case ResolverBigDataCloud:
 		resolver = new(BigDataCloud)
 	case ResolverICanHazIP:
-		resolver = new(ICanHazIP)
+		resolver = NewSimpleResolver(ResolverURLs[ResolverICanHazIP])
 	case ResolverIfconfigMe:
 		resolver = NewSimpleResolver(ResolverURLs[ResolverIfconfigMe])
 	case ResolverIPAPICo:
@@ -76,7 +76,7 @@ func Get(key string) (*Resolver, error) {
 	case ResolverWhatIsMyIPAddress:
 		resolver = NewSimpleResolver(ResolverURLs[ResolverWhatIsMyIPAddress])
 	case ResolverWtfIsMyIP:
-		resolver = new(WTFIsMyIP)
+		resolver = NewSimpleResolver(ResolverURLs[ResolverWtfIsMyIP])
 	default:
 		return nil, fmt.Errorf("unsupported resolver: %s", key)
 	}

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"regexp"
 
 	"github.com/kerti/cloudflare-ddns/logger"
 	"github.com/spf13/viper"
@@ -47,7 +48,12 @@ func (s *Simple) GetExternalIP() (net.IP, error) {
 			return nil, err
 		}
 
-		ipString := string(bodyBytes)
+		reg, err := regexp.Compile("[^0-9\\.]+")
+		if err != nil {
+			return nil, err
+		}
+
+		ipString := reg.ReplaceAllString(string(bodyBytes), "")
 		parsedIP := net.ParseIP(ipString)
 		if parsedIP == nil {
 			return nil, fmt.Errorf("cannot parse IP: %s", ipString)
