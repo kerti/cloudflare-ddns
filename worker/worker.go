@@ -35,7 +35,7 @@ type Worker struct {
 	CurrentIP  net.IP
 }
 
-func (w *Worker) init() error {
+func (w *Worker) initProperties() error {
 	// initialize the resolvers
 	resolvers, err := resolver.GetAll()
 	if err != nil {
@@ -56,6 +56,10 @@ func (w *Worker) init() error {
 	}
 	w.Cloudflare = *cfClient
 
+	return nil
+}
+
+func (w *Worker) initExternal() error {
 	// initialize hostmap
 	w.getDNSRecords()
 
@@ -69,6 +73,22 @@ func (w *Worker) init() error {
 
 	// run first check on host list
 	err = w.checkHosts()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (w *Worker) init() error {
+	// initialize properties
+	err := w.initProperties()
+	if err != nil {
+		return err
+	}
+
+	// initialize stuff requiring external connections
+	err = w.initExternal()
 	if err != nil {
 		return err
 	}
