@@ -43,12 +43,6 @@ var (
 	}
 )
 
-// CheckConfig checks the resolver configuration
-func CheckConfig() error {
-	logger.Debug("Resolver configuration OK.")
-	return nil
-}
-
 // Resolver is the base service
 type Resolver interface {
 	Init() error

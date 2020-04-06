@@ -10,7 +10,6 @@ import (
 	"github.com/kerti/cloudflare-ddns/cloudflare"
 	"github.com/kerti/cloudflare-ddns/config"
 	"github.com/kerti/cloudflare-ddns/logger"
-	"github.com/kerti/cloudflare-ddns/resolver"
 	"github.com/kerti/cloudflare-ddns/worker"
 )
 
@@ -46,11 +45,6 @@ func initialize() error {
 	}
 
 	err = config.Load(optConfig)
-	if err != nil {
-		return err
-	}
-
-	err = resolver.CheckConfig()
 	if err != nil {
 		return err
 	}
