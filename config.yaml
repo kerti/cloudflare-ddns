@@ -1,0 +1,39 @@
+# Cloudflare DDNS main configuration file.
+# Uncomment and change as necessary.
+
+# Log verbosity level. Levels are as follows:
+# 1 - NONE
+# 2 - PRINT
+# 3 - ERROR
+# 4 - WARN
+# 5 - INFO
+# 6 - DEBUG
+# Defaults to 3.
+# loglevel: 3
+
+# IP Resolver configuration
+ipResolver:
+  # Do not verify TLS certificates. Defaults to true.
+  # noVerify: true
+
+# Cloudflare configuration
+cloudflare:
+  # The email address you use to log into cloudflare.com. There is no default.
+  email: <your-cloudflare-email>
+  # Your API key. There is no default.
+  apiKey: <your-cloudflare-api-key>
+  # Your Zone ID. There is no default.
+  zoneID: <your-cloudflare-zone-id>
+  # List of the hostnames you would like to update. There is no default.
+  hostnames:
+    - <hostname-1>
+    - <hostname-2
+
+worker:
+  # Check interval in seconds.
+  # Minimum: 10 (to prevent bursting a bunch of checks)
+  # Maximum: 4294967295 (uint32 max value)
+  # Defaults to 35, the reasoning being that there are currently 9 resolvers implemented.
+  # With 35 seconds between checks, a resolver will be invoked at most once every 5 minutes.
+  # This gives the fastest check interval without irresponsibly invoking any resolver.
+  # checkInterval: 35
