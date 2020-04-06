@@ -70,7 +70,6 @@ func (w *Worker) initExternal() error {
 	currentIP, err := rslv.GetExternalIP()
 	if err != nil {
 		logger.Error(err.Error())
-		return err
 	}
 	w.CurrentIP = currentIP
 
@@ -128,7 +127,6 @@ func (w *Worker) check() error {
 	err := w.getExternalIP()
 	if err != nil {
 		logger.Error(err.Error())
-		return err
 	}
 
 	if w.Counter == len(w.Resolvers)-1 {
