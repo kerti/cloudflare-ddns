@@ -28,7 +28,7 @@ func CheckConfig() error {
 // Worker is the worker class
 type Worker struct {
 	Cloudflare cloudflare.Cloudflare
-	Resolvers  []resolver.Resolver
+	Resolvers  []*resolver.Resolver
 	Counter    int
 	Hosts      []string
 	HostMap    map[string]cf.DNSRecord
@@ -60,7 +60,8 @@ func (w *Worker) init() error {
 	w.getDNSRecords()
 
 	// get current IP
-	currentIP, err := w.Resolvers[len(w.Resolvers)-1].GetExternalIP()
+	rslv := *w.Resolvers[len(w.Resolvers)-1]
+	currentIP, err := rslv.GetExternalIP()
 	if err != nil {
 		return err
 	}
@@ -123,7 +124,8 @@ func (w *Worker) getExternalIP() error {
 		w.Counter = 0
 	}
 
-	externalIP, err := w.Resolvers[w.Counter].GetExternalIP()
+	rslv := *w.Resolvers[w.Counter]
+	externalIP, err := rslv.GetExternalIP()
 	w.Counter++
 
 	if err != nil {

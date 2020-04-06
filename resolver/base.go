@@ -29,17 +29,17 @@ const (
 )
 
 var (
-	// Resolvers is the list of available resolvers
-	Resolvers = map[string]string{
-		ResolverBigDataCloud:      ResolverBigDataCloud,
-		ResolverICanHazIP:         ResolverICanHazIP,
-		ResolverIfconfigMe:        ResolverIfconfigMe,
-		ResolverIPAPICo:           ResolverIPAPICo,
-		ResolverIpify:             ResolverIpify,
-		ResolverMyExternalIP:      ResolverMyExternalIP,
-		ResolverMyIP:              ResolverMyIP,
-		ResolverWhatIsMyIPAddress: ResolverWhatIsMyIPAddress,
-		ResolverWtfIsMyIP:         ResolverWtfIsMyIP,
+	// ResolverURLs is the map of available resolvers and their URLs
+	ResolverURLs = map[string]string{
+		ResolverBigDataCloud:      "https://api.bigdatacloud.net/data/client-ip",
+		ResolverICanHazIP:         "http://icanhazip.com",
+		ResolverIfconfigMe:        "https://ifconfig.me/ip",
+		ResolverIPAPICo:           "https://ipapi.co/ip",
+		ResolverIpify:             "https://api.ipify.org?format=text",
+		ResolverMyExternalIP:      "https://myexternalip.com/raw",
+		ResolverMyIP:              "https://api.myip.com",
+		ResolverWhatIsMyIPAddress: "http://ipv4bot.whatismyipaddress.com",
+		ResolverWtfIsMyIP:         "https://wtfismyip.com",
 	}
 )
 
@@ -56,7 +56,7 @@ type Resolver interface {
 }
 
 // Get instantiates a new instance of the resolver
-func Get(key string) (Resolver, error) {
+func Get(key string) (*Resolver, error) {
 	var resolver Resolver
 	switch key {
 	case ResolverBigDataCloud:
@@ -64,17 +64,17 @@ func Get(key string) (Resolver, error) {
 	case ResolverICanHazIP:
 		resolver = new(ICanHazIP)
 	case ResolverIfconfigMe:
-		resolver = new(IfconfigMe)
+		resolver = NewSimpleResolver(ResolverURLs[ResolverIfconfigMe])
 	case ResolverIPAPICo:
-		resolver = new(IPAPICo)
+		resolver = NewSimpleResolver(ResolverURLs[ResolverIPAPICo])
 	case ResolverIpify:
-		resolver = new(Ipify)
+		resolver = NewSimpleResolver(ResolverURLs[ResolverIpify])
 	case ResolverMyExternalIP:
-		resolver = new(MyExternalIP)
+		resolver = NewSimpleResolver(ResolverURLs[ResolverMyExternalIP])
 	case ResolverMyIP:
 		resolver = new(MyIP)
 	case ResolverWhatIsMyIPAddress:
-		resolver = new(WhatIsMyIPAddress)
+		resolver = NewSimpleResolver(ResolverURLs[ResolverWhatIsMyIPAddress])
 	case ResolverWtfIsMyIP:
 		resolver = new(WTFIsMyIP)
 	default:
@@ -86,13 +86,13 @@ func Get(key string) (Resolver, error) {
 		return nil, err
 	}
 	logger.Debug("Resolver [%s] initiated...", key)
-	return resolver, nil
+	return &resolver, nil
 }
 
 // GetAll instantiate all resolvers
-func GetAll() ([]Resolver, error) {
-	resolvers := make([]Resolver, 0)
-	for resKey := range Resolvers {
+func GetAll() ([]*Resolver, error) {
+	resolvers := make([]*Resolver, 0)
+	for resKey := range ResolverURLs {
 		instantiated, err := Get(resKey)
 		if err != nil {
 			return nil, err

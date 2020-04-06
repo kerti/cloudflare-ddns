@@ -11,13 +11,20 @@ import (
 	"github.com/spf13/viper"
 )
 
-// IfconfigMe is the IfconfigMe implementation
-type IfconfigMe struct {
+// NewSimpleResolver instantiates a new simple resolver given a URL
+func NewSimpleResolver(url string) Resolver {
+	return &Simple{URL: url}
+}
+
+// Simple is the simplest implementation of external IP resolver, relying on text-based respnse
+type Simple struct {
+	URL        string
 	HTTPClient *http.Client
 }
 
-func (i *IfconfigMe) Init() error {
-	i.HTTPClient = &http.Client{
+// Init initializes the resolver
+func (s *Simple) Init() error {
+	s.HTTPClient = &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: viper.GetBool("ipResolver.noVerify")},
 		},
@@ -25,8 +32,9 @@ func (i *IfconfigMe) Init() error {
 	return nil
 }
 
-func (i *IfconfigMe) GetExternalIP() (net.IP, error) {
-	r, err := i.HTTPClient.Get("https://ifconfig.me/ip")
+// GetExternalIP invokes the URL and fetches the external IP returned
+func (s *Simple) GetExternalIP() (net.IP, error) {
+	r, err := s.HTTPClient.Get(s.URL)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +53,7 @@ func (i *IfconfigMe) GetExternalIP() (net.IP, error) {
 			return nil, fmt.Errorf("cannot parse IP: %s", ipString)
 		}
 
-		logger.Debug("[IfconfigMe] Detected external IP: %v", parsedIP)
+		logger.Debug("[Simple] [%s] Detected external IP: %v", s.URL, parsedIP)
 		return parsedIP, nil
 	}
 
