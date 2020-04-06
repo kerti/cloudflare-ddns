@@ -66,6 +66,6 @@ func (s *Simple) readIP(r *http.Response) (net.IP, error) {
 		return nil, fmt.Errorf("cannot parse IP: %s", ipString)
 	}
 
-	logger.Debug("[Simple] [%s] Detected external IP: %v", s.URL, parsedIP)
+	logger.Debug("[RSLV-SIMP] [%s] Detected external IP: %v", s.URL, parsedIP)
 	return parsedIP, nil
 }

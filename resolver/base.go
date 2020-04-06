@@ -41,6 +41,12 @@ var (
 		ResolverWhatIsMyIPAddress: "http://ipv4bot.whatismyipaddress.com",
 		ResolverWtfIsMyIP:         "https://wtfismyip.com/text",
 	}
+
+	// ResolverJSONPaths is the map of available resolvers and their JSON paths
+	ResolverJSONPaths = map[string]string{
+		ResolverBigDataCloud: "ipString",
+		ResolverMyIP:         "ip",
+	}
 )
 
 // Resolver is the base service
@@ -54,7 +60,9 @@ func Get(key string) (*Resolver, error) {
 	var resolver Resolver
 	switch key {
 	case ResolverBigDataCloud:
-		resolver = new(BigDataCloud)
+		resolver = NewJSONResolver(
+			ResolverURLs[ResolverBigDataCloud],
+			ResolverJSONPaths[ResolverBigDataCloud])
 	case ResolverICanHazIP:
 		resolver = NewSimpleResolver(ResolverURLs[ResolverICanHazIP])
 	case ResolverIfconfigMe:
@@ -66,7 +74,9 @@ func Get(key string) (*Resolver, error) {
 	case ResolverMyExternalIP:
 		resolver = NewSimpleResolver(ResolverURLs[ResolverMyExternalIP])
 	case ResolverMyIP:
-		resolver = new(MyIP)
+		resolver = NewJSONResolver(
+			ResolverURLs[ResolverMyIP],
+			ResolverJSONPaths[ResolverMyIP])
 	case ResolverWhatIsMyIPAddress:
 		resolver = NewSimpleResolver(ResolverURLs[ResolverWhatIsMyIPAddress])
 	case ResolverWtfIsMyIP:
