@@ -43,25 +43,29 @@ func (s *Simple) GetExternalIP() (net.IP, error) {
 	defer r.Body.Close()
 
 	if r.StatusCode == http.StatusOK {
-		bodyBytes, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		reg, err := regexp.Compile("[^0-9\\.]+")
-		if err != nil {
-			return nil, err
-		}
-
-		ipString := reg.ReplaceAllString(string(bodyBytes), "")
-		parsedIP := net.ParseIP(ipString)
-		if parsedIP == nil {
-			return nil, fmt.Errorf("cannot parse IP: %s", ipString)
-		}
-
-		logger.Debug("[Simple] [%s] Detected external IP: %v", s.URL, parsedIP)
-		return parsedIP, nil
+		return s.readIP(r)
 	}
 
 	return nil, err
+}
+
+func (s *Simple) readIP(r *http.Response) (net.IP, error) {
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	reg, err := regexp.Compile("[^0-9\\.]+")
+	if err != nil {
+		return nil, err
+	}
+
+	ipString := reg.ReplaceAllString(string(bodyBytes), "")
+	parsedIP := net.ParseIP(ipString)
+	if parsedIP == nil {
+		return nil, fmt.Errorf("cannot parse IP: %s", ipString)
+	}
+
+	logger.Debug("[Simple] [%s] Detected external IP: %v", s.URL, parsedIP)
+	return parsedIP, nil
 }
