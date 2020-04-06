@@ -118,7 +118,6 @@ func (w *Worker) Run() error {
 		err := w.check()
 		if err != nil {
 			logger.Error(err.Error())
-			return err
 		}
 	}
 
