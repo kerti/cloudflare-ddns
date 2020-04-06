@@ -46,16 +46,19 @@ func initialize() error {
 
 	err = config.Load(optConfig)
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 
 	err = cloudflare.CheckConfig()
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 
 	err = worker.CheckConfig()
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 

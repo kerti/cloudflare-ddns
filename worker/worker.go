@@ -39,6 +39,7 @@ func (w *Worker) initProperties() error {
 	// initialize the resolvers
 	resolvers, err := resolver.GetAll()
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 	w.Resolvers = resolvers
@@ -52,6 +53,7 @@ func (w *Worker) initProperties() error {
 	// initialize cloudflare client
 	cfClient, err := cloudflare.New()
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 	w.Cloudflare = *cfClient
@@ -67,6 +69,7 @@ func (w *Worker) initExternal() error {
 	rslv := *w.Resolvers[len(w.Resolvers)-1]
 	currentIP, err := rslv.GetExternalIP()
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 	w.CurrentIP = currentIP
@@ -74,6 +77,7 @@ func (w *Worker) initExternal() error {
 	// run first check on host list
 	err = w.checkHosts()
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 
@@ -84,12 +88,14 @@ func (w *Worker) init() error {
 	// initialize properties
 	err := w.initProperties()
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 
 	// initialize stuff requiring external connections
 	err = w.initExternal()
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 
@@ -102,6 +108,7 @@ func (w *Worker) init() error {
 func (w *Worker) Run() error {
 	err := w.init()
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 
@@ -110,6 +117,7 @@ func (w *Worker) Run() error {
 	for range t.C {
 		err := w.check()
 		if err != nil {
+			logger.Error(err.Error())
 			return err
 		}
 	}
@@ -117,13 +125,10 @@ func (w *Worker) Run() error {
 	return nil
 }
 
-func (w *Worker) update(newIP net.IP) error {
-	return nil
-}
-
 func (w *Worker) check() error {
 	err := w.getExternalIP()
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 
@@ -133,6 +138,7 @@ func (w *Worker) check() error {
 
 	err = w.checkHosts()
 	if err != nil {
+		logger.Error(err.Error())
 		return err
 	}
 

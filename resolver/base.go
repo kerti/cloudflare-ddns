@@ -82,11 +82,14 @@ func Get(key string) (*Resolver, error) {
 	case ResolverWtfIsMyIP:
 		resolver = NewSimpleResolver(ResolverURLs[ResolverWtfIsMyIP])
 	default:
-		return nil, fmt.Errorf("unsupported resolver: %s", key)
+		err := fmt.Errorf("unsupported resolver: %s", key)
+		logger.Error(err.Error())
+		return nil, err
 	}
 
 	err := resolver.Init()
 	if err != nil {
+		logger.Error(err.Error())
 		return nil, err
 	}
 	logger.Debug("Resolver [%s] initiated...", key)
@@ -99,6 +102,7 @@ func GetAll() ([]*Resolver, error) {
 	for resKey := range ResolverURLs {
 		instantiated, err := Get(resKey)
 		if err != nil {
+			logger.Error(err.Error())
 			return nil, err
 		}
 		resolvers = append(resolvers, instantiated)
