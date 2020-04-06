@@ -1,4 +1,8 @@
 # cloudflare-ddns
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/kerti/cloudflare-ddns)](https://goreportcard.com/report/github.com/kerti/cloudflare-ddns)
+[![Maintainability](https://api.codeclimate.com/v1/badges/77883b0508313dc1ba32/maintainability)](https://codeclimate.com/github/kerti/cloudflare-ddns/maintainability)
+
 Simple standalone DDNS updater using Cloudflare.
 
 # Roadmap

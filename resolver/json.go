@@ -38,6 +38,7 @@ func (j *JSON) Init() error {
 func (j *JSON) GetExternalIP() (net.IP, error) {
 	r, err := j.HTTPClient.Get(j.URL)
 	if err != nil {
+		logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -47,30 +48,37 @@ func (j *JSON) GetExternalIP() (net.IP, error) {
 		return j.readIP(r)
 	}
 
+	err = fmt.Errorf("provider responded with HTTP/%v", r.StatusCode)
+	logger.Error(err.Error())
 	return nil, err
 }
 
 func (j *JSON) readIP(r *http.Response) (net.IP, error) {
 	bodyBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
+		logger.Error(err.Error())
 		return nil, err
 	}
 
 	var kvMap map[string]interface{}
 	err = json.Unmarshal(bodyBytes, &kvMap)
 	if err != nil {
+		logger.Error(err.Error())
 		return nil, err
 	}
 
 	ipObj := kvMap[j.JSONPath]
 	ipString, ok := ipObj.(string)
 	if !ok {
+		logger.Error(err.Error())
 		return nil, err
 	}
 
 	parsedIP := net.ParseIP(ipString)
 	if parsedIP == nil {
-		return nil, fmt.Errorf("cannot parse IP: %v", ipObj)
+		err = fmt.Errorf("cannot parse IP: %v", ipObj)
+		logger.Error(err.Error())
+		return nil, err
 	}
 
 	logger.Debug("[RSLV-JSON] [%s] Detected external IP: %v", j.URL, parsedIP)

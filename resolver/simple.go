@@ -37,6 +37,7 @@ func (s *Simple) Init() error {
 func (s *Simple) GetExternalIP() (net.IP, error) {
 	r, err := s.HTTPClient.Get(s.URL)
 	if err != nil {
+		logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -46,24 +47,30 @@ func (s *Simple) GetExternalIP() (net.IP, error) {
 		return s.readIP(r)
 	}
 
+	err = fmt.Errorf("provider responded with HTTP/%v", r.StatusCode)
+	logger.Error(err.Error())
 	return nil, err
 }
 
 func (s *Simple) readIP(r *http.Response) (net.IP, error) {
 	bodyBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
+		logger.Error(err.Error())
 		return nil, err
 	}
 
 	reg, err := regexp.Compile("[^0-9\\.]+")
 	if err != nil {
+		logger.Error(err.Error())
 		return nil, err
 	}
 
 	ipString := reg.ReplaceAllString(string(bodyBytes), "")
 	parsedIP := net.ParseIP(ipString)
 	if parsedIP == nil {
-		return nil, fmt.Errorf("cannot parse IP: %s", ipString)
+		err = fmt.Errorf("cannot parse IP: %v", ipString)
+		logger.Error(err.Error())
+		return nil, err
 	}
 
 	logger.Debug("[RSLV-SIMP] [%s] Detected external IP: %v", s.URL, parsedIP)

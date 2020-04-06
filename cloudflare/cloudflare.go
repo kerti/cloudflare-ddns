@@ -35,6 +35,7 @@ func New() (*Cloudflare, error) {
 
 	api, err := cf.New(apiKey, email)
 	if err != nil {
+		logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -49,6 +50,7 @@ func (c *Cloudflare) FetchA(host string) (result map[string]cf.DNSRecord, err er
 	logger.Debug("[CLOUDFLARE] Fetching A record for host [%v]", host)
 	records, err := c.cf.DNSRecords(c.zoneID, cf.DNSRecord{Name: host, Type: "A"})
 	if err != nil {
+		logger.Error(err.Error())
 		return
 	}
 
@@ -72,6 +74,7 @@ func (c *Cloudflare) CreateA(name string, ip net.IP) (result cf.DNSRecord, err e
 
 	cfResponse, err := c.cf.CreateDNSRecord(c.zoneID, rr)
 	if err != nil {
+		logger.Error(err.Error())
 		return result, err
 	}
 
