@@ -2,6 +2,8 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/kerti/cloudflare-ddns)](https://goreportcard.com/report/github.com/kerti/cloudflare-ddns)
 [![Maintainability](https://api.codeclimate.com/v1/badges/77883b0508313dc1ba32/maintainability)](https://codeclimate.com/github/kerti/cloudflare-ddns/maintainability)
+[![Build Status](https://travis-ci.org/kerti/cloudflare-ddns.svg?branch=master)](https://travis-ci.org/kerti/cloudflare-ddns)
+[![Coverage Status](https://coveralls.io/repos/github/kerti/cloudflare-ddns/badge.svg?branch=master)](https://coveralls.io/github/kerti/cloudflare-ddns?branch=master)
 
 Simple standalone DDNS updater using Cloudflare.
 
