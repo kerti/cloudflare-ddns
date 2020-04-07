@@ -13,8 +13,6 @@ import (
 )
 
 var (
-	// initial loglevel for mocking logger
-	initloglevel uint8 = uint8(0)
 	// test vars go here
 	readIPTestCases = []struct {
 		name     string
