@@ -1,7 +1,10 @@
-# cloudflare-ddns
+[![License](https://img.shields.io/github/license/kerti/cloudflare-ddns?style=for-the-badge)](https://github.com/kerti/cloudflare-ddns/blob/master/LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kerti/cloudflare-ddns?style=for-the-badge)](https://goreportcard.com/report/github.com/kerti/cloudflare-ddns)
+[![Maintainability](https://img.shields.io/codeclimate/maintainability-percentage/kerti/cloudflare-ddns?style=for-the-badge)](https://codeclimate.com/github/kerti/cloudflare-ddns/maintainability)
+[![Build Status](https://img.shields.io/travis/kerti/cloudflare-ddns/master?style=for-the-badge)](https://travis-ci.org/kerti/cloudflare-ddns)
+[![Coverage Status](https://img.shields.io/coveralls/github/kerti/cloudflare-ddns?style=for-the-badge)](https://coveralls.io/github/kerti/cloudflare-ddns?branch=master)
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/kerti/cloudflare-ddns)](https://goreportcard.com/report/github.com/kerti/cloudflare-ddns)
-[![Maintainability](https://api.codeclimate.com/v1/badges/77883b0508313dc1ba32/maintainability)](https://codeclimate.com/github/kerti/cloudflare-ddns/maintainability)
+# Cloudflare Dynamic DNS
 
 Simple standalone DDNS updater using Cloudflare.
 
@@ -22,15 +25,15 @@ Simple standalone DDNS updater using Cloudflare.
 - [x] Automatically create A records
 - [x] Automatically update A records
 - [ ] Simplify codebase
-  - [ ] Use single class for simple IP lookup provider
+  - [x] Use single class for simple IP lookup provider
   - [ ] Do away with cloudflare wrapper and just do it in worker
 - [ ] Do I need to do anything asynchronously?
-- [ ] Optimize binary executable size
+- [x] Optimize binary executable size
 - [ ] Notifiers
   - [ ] Email
   - [ ] Telegram
   - [ ] and more...
-- [ ] Code linter/vetter/checker
+- [x] Code linter/vetter/checker
 - [ ] Unit tests
-- [ ] Code coverage
-- [ ] CI integration
+- [x] Code coverage
+- [x] CI integration
