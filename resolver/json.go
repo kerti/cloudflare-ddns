@@ -53,6 +53,28 @@ func (j *JSON) GetExternalIP() (net.IP, error) {
 }
 
 func (j *JSON) readIP(r *http.Response) (net.IP, error) {
+	kvMap, err := j.getResponseJSONMap(r)
+	if err != nil {
+		return nil, err
+	}
+
+	ipString, err := j.findIPString(kvMap)
+	if err != nil {
+		return nil, err
+	}
+
+	parsedIP := net.ParseIP(ipString)
+	if parsedIP == nil {
+		err = fmt.Errorf("cannot parse IP: %v", ipString)
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	logger.Debug("[RSLV-JSON] [%s] Detected external IP: %v", j.URL, parsedIP)
+	return parsedIP, nil
+}
+
+func (j *JSON) getResponseJSONMap(r *http.Response) (map[string]interface{}, error) {
 	if r == nil {
 		err := fmt.Errorf("response is nil")
 		logger.Error(err.Error())
@@ -72,27 +94,23 @@ func (j *JSON) readIP(r *http.Response) (net.IP, error) {
 		return nil, err
 	}
 
+	return kvMap, nil
+}
+
+func (j *JSON) findIPString(kvMap map[string]interface{}) (string, error) {
 	ipObj := kvMap[j.JSONPath]
 	if ipObj == nil {
-		err = fmt.Errorf("IP address not found at path [%s]", j.JSONPath)
+		err := fmt.Errorf("IP address not found at path [%s]", j.JSONPath)
 		logger.Error(err.Error())
-		return nil, err
+		return "", err
 	}
 
 	ipString, ok := ipObj.(string)
 	if !ok {
-		err = fmt.Errorf("cannot convert value at path [%s] to string: %v", j.JSONPath, ipObj)
+		err := fmt.Errorf("cannot convert value at path [%s] to string: %v", j.JSONPath, ipObj)
 		logger.Error(err.Error())
-		return nil, err
+		return "", err
 	}
 
-	parsedIP := net.ParseIP(ipString)
-	if parsedIP == nil {
-		err = fmt.Errorf("cannot parse IP: %v", ipObj)
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	logger.Debug("[RSLV-JSON] [%s] Detected external IP: %v", j.URL, parsedIP)
-	return parsedIP, nil
+	return ipString, nil
 }

@@ -74,5 +74,6 @@ func TestSimpleResolver(t *testing.T) {
 				assert.Equal(t, tc.err, err)
 			})
 		}
+
 	})
 }
