@@ -52,6 +52,12 @@ func (s *Simple) GetExternalIP() (net.IP, error) {
 }
 
 func (s *Simple) readIP(r *http.Response) (net.IP, error) {
+	if r == nil {
+		err := fmt.Errorf("response is nil")
+		logger.Error(err.Error())
+		return nil, err
+	}
+
 	bodyBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		logger.Error(err.Error())

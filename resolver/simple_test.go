@@ -2,10 +2,7 @@ package resolver
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net"
-	"net/http"
-	"strings"
 	"testing"
 
 	"github.com/kerti/cloudflare-ddns/logger"
@@ -14,7 +11,7 @@ import (
 
 var (
 	// test vars go here
-	readIPTestCases = []struct {
+	simpleReadIPTestCases = []struct {
 		name     string
 		response string
 		result   net.IP
@@ -53,21 +50,24 @@ var (
 	}
 )
 
-func mockHTTPResponse(input string) *http.Response {
-	return &http.Response{
-		Body: ioutil.NopCloser(strings.NewReader(input)),
-	}
-}
-
 func TestSimpleResolver(t *testing.T) {
 
 	logger.InitLogger(&initloglevel)
 
 	t.Run("readIP", func(t *testing.T) {
+
 		resolver := Simple{
 			URL: "",
 		}
-		for _, tc := range readIPTestCases {
+
+		t.Run("nilResponse", func(t *testing.T) {
+			result, err := resolver.readIP(nil)
+			assert.Nil(t, result)
+			assert.NotNil(t, err)
+			assert.Equal(t, "response is nil", err.Error())
+		})
+
+		for _, tc := range simpleReadIPTestCases {
 			t.Run(tc.name, func(t *testing.T) {
 				result, err := resolver.readIP(mockHTTPResponse(tc.response))
 				assert.Equal(t, tc.result, result)

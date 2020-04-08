@@ -53,6 +53,12 @@ func (j *JSON) GetExternalIP() (net.IP, error) {
 }
 
 func (j *JSON) readIP(r *http.Response) (net.IP, error) {
+	if r == nil {
+		err := fmt.Errorf("response is nil")
+		logger.Error(err.Error())
+		return nil, err
+	}
+
 	bodyBytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		logger.Error(err.Error())
@@ -67,8 +73,15 @@ func (j *JSON) readIP(r *http.Response) (net.IP, error) {
 	}
 
 	ipObj := kvMap[j.JSONPath]
+	if ipObj == nil {
+		err = fmt.Errorf("IP address not found at path [%s]", j.JSONPath)
+		logger.Error(err.Error())
+		return nil, err
+	}
+
 	ipString, ok := ipObj.(string)
 	if !ok {
+		err = fmt.Errorf("cannot convert value at path [%s] to string: %v", j.JSONPath, ipObj)
 		logger.Error(err.Error())
 		return nil, err
 	}

@@ -2,6 +2,9 @@ package resolver
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/kerti/cloudflare-ddns/logger"
@@ -23,6 +26,12 @@ func getJSONResolver(url string) *Resolver {
 	var resolver Resolver
 	resolver = &JSON{URL: url}
 	return &resolver
+}
+
+func mockHTTPResponse(input string) *http.Response {
+	return &http.Response{
+		Body: ioutil.NopCloser(strings.NewReader(input)),
+	}
 }
 
 func TestBase(t *testing.T) {
