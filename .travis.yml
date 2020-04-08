@@ -6,6 +6,7 @@ before_install:
   - go get github.com/mattn/goveralls
 script:
   - go build -ldflags="-s -w"
-  - $HOME/gopath/bin/goveralls -service=travis-ci
+  - bash coverage.sh
+  - $HOME/gopath/bin/goveralls -service=travis-ci -coverprofile=.cover/cover.out
 notifications:
   email: false

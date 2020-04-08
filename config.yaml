@@ -27,7 +27,7 @@ cloudflare:
   # List of the hostnames you would like to update. There is no default.
   hostnames:
     - <hostname-1>
-    - <hostname-2
+    - <hostname-2>
 
 worker:
   # Check interval in seconds.

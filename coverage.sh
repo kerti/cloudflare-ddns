@@ -2,7 +2,7 @@ set -e
 
 workdir=.cover
 profile="$workdir/cover.out"
-mode=count
+mode=atomic
 
 generate_cover_data() {
     rm -rf "$workdir"
@@ -10,7 +10,7 @@ generate_cover_data() {
 
     for pkg in "$@"; do
         f="$workdir/$(echo $pkg | tr / -).cover"
-        go test -covermode="$mode" -coverprofile="$f" "$pkg"
+        go test -race -covermode="$mode" -coverprofile="$f" "$pkg"
     done
 
     echo "mode: $mode" >"$profile"

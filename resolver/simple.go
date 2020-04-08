@@ -24,13 +24,12 @@ type Simple struct {
 }
 
 // Init initializes the resolver
-func (s *Simple) Init() error {
+func (s *Simple) Init() {
 	s.HTTPClient = &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: viper.GetBool("ipResolver.noVerify")},
 		},
 	}
-	return nil
 }
 
 // GetExternalIP invokes the URL and fetches the external IP returned
@@ -53,9 +52,8 @@ func (s *Simple) GetExternalIP() (net.IP, error) {
 }
 
 func (s *Simple) readIP(r *http.Response) (net.IP, error) {
-	bodyBytes, err := ioutil.ReadAll(r.Body)
+	bodyBytes, err := s.getResponseBody(r)
 	if err != nil {
-		logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -75,4 +73,20 @@ func (s *Simple) readIP(r *http.Response) (net.IP, error) {
 
 	logger.Debug("[RSLV-SIMP] [%s] Detected external IP: %v", s.URL, parsedIP)
 	return parsedIP, nil
+}
+
+func (s *Simple) getResponseBody(r *http.Response) ([]byte, error) {
+	if r == nil {
+		err := fmt.Errorf("response is nil")
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	return bodyBytes, nil
 }
