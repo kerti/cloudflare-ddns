@@ -51,7 +51,7 @@ var (
 
 // Resolver is the base service
 type Resolver interface {
-	Init() error
+	Init()
 	GetExternalIP() (net.IP, error)
 }
 
@@ -87,11 +87,7 @@ func Get(key string) (*Resolver, error) {
 		return nil, err
 	}
 
-	err := resolver.Init()
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
+	resolver.Init()
 	logger.Debug("Resolver [%s] initiated...", key)
 	return &resolver, nil
 }

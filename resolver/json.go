@@ -25,13 +25,12 @@ type JSON struct {
 }
 
 // Init initializes the resolver
-func (j *JSON) Init() error {
+func (j *JSON) Init() {
 	j.HTTPClient = &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: viper.GetBool("ipResolver.noVerify")},
 		},
 	}
-	return nil
 }
 
 // GetExternalIP invokes the URL and fetches the external IP returned
