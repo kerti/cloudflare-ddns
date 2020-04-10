@@ -14,13 +14,14 @@ func Load(optConfig *string) error {
 	flag.Parse()
 
 	/* set config locations */
+	viper.SetConfigType("yaml")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	viper.SetConfigFile(*optConfig)
 
 	/* set default config values */
 	viper.SetDefault("loglevel", 3)
-	viper.SetDefault("ipResolver.noVerify", true)
+	viper.SetDefault("resolver.noVerify", true)
 	viper.SetDefault("worker.checkInterval", 35)
 
 	/* read the config file */
