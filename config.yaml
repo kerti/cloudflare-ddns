@@ -12,9 +12,41 @@
 # loglevel: 3
 
 # IP Resolver configuration
-ipResolver:
+resolver:
   # Do not verify TLS certificates. Defaults to true.
   # noVerify: true
+
+  # List of IP resolvers available. Can add as needed.
+  list:
+    - name: BigDataCloud
+      type: json
+      url: https://api.bigdatacloud.net/data/client-ip
+      jsonPath: ipString
+    - name: ICanHazIP
+      type: text
+      url: http://icanhazip.com
+    - name: IfconfigMe
+      type: text
+      url: https://ifconfig.me/ip
+    - name: IPAPICo
+      type: text
+      url: https://ipapi.co/ip
+    - name: Ipify
+      type: text
+      url: https://api.ipify.org?format=text
+    - name: MyExternalIP
+      type: text
+      url: https://myexternalip.com/raw
+    - name: MyIP
+      type: json
+      url: https://api.myip.com
+      jsonPath: ip
+    - name: WhatIsMyIPAddress
+      type: text
+      url: http://ipv4bot.whatismyipaddress.com
+    - name: WTFIsMyIP
+      type: text
+      url: https://wtfismyip.com/text
 
 # Cloudflare configuration
 cloudflare:
