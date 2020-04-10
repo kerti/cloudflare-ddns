@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/kerti/cloudflare-ddns/config"
 	"github.com/kerti/cloudflare-ddns/logger"
 	"github.com/stretchr/testify/assert"
 )
@@ -233,6 +234,15 @@ func mockHTTPResponse(input string) *http.Response {
 func TestResolver(t *testing.T) {
 
 	logger.InitLogger(&initloglevel)
+
+	t.Run("Get", func(t *testing.T) {
+		configFile := "../config.yaml"
+		config.Load(&configFile)
+		res, err := Get()
+		assert.NotNil(t, res)
+		assert.NotEmpty(t, res)
+		assert.Nil(t, err)
+	})
 
 	t.Run("init", func(t *testing.T) {
 		resolver := Resolver{}
