@@ -69,7 +69,7 @@ func (r *Resolver) GetExternalIP() (net.IP, error) {
 		case "json":
 			return r.readIPJSON(*response)
 		default:
-			err = fmt.Errorf("unsupported resolver type: %v", r.Type)
+			err = fmt.Errorf("unsupported resolver type: [%v]", r.Type)
 			logger.Error(err.Error())
 			return nil, err
 		}
@@ -95,7 +95,7 @@ func (r *Resolver) readIPText(response http.Response) (net.IP, error) {
 	ipString := reg.ReplaceAllString(string(bodyBytes), "")
 	parsedIP := net.ParseIP(ipString)
 	if parsedIP == nil {
-		err = fmt.Errorf("cannot parse IP: %v", ipString)
+		err = fmt.Errorf("cannot parse IP: [%v]", string(bodyBytes))
 		logger.Error(err.Error())
 		return nil, err
 	}
