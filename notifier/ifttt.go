@@ -27,17 +27,12 @@ func (i *IFTTT) Notify() error {
 
 	makerKey := viper.GetString("notifier.ifttt.webhook.makerKey")
 	eventName := viper.GetString("notifier.ifttt.webhook.eventName")
-
 	url := fmt.Sprintf("https://maker.ifttt.com/trigger/%s/with/key/%s", eventName, makerKey)
 
-	body, err := json.Marshal(i)
-	if err != nil {
-		logger.Error(err.Error())
-		return err
-	}
-
+	body, _ := json.Marshal(i)
 	buffer := bytes.NewBuffer([]byte(body))
 	client := &http.Client{}
+
 	resp, err := client.Post(url, "application/json", buffer)
 	if err != nil {
 		logger.Error(err.Error())
