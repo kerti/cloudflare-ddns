@@ -8,6 +8,7 @@ import (
 	cf "github.com/cloudflare/cloudflare-go"
 	"github.com/kerti/cloudflare-ddns/cloudflare"
 	"github.com/kerti/cloudflare-ddns/logger"
+	"github.com/kerti/cloudflare-ddns/notifier"
 	"github.com/kerti/cloudflare-ddns/resolver"
 	"github.com/spf13/viper"
 )
@@ -197,7 +198,11 @@ func (w *Worker) checkHosts() error {
 			err := w.Cloudflare.UpdateA(rec.ID, host, w.CurrentIP)
 			if err != nil {
 				logger.Error(err.Error())
+				continue
 			}
+
+			go w.setIP(host, w.CurrentIP)
+			go w.notify(host, parsedContent.String(), w.CurrentIP.String())
 			continue
 		}
 
@@ -206,7 +211,11 @@ func (w *Worker) checkHosts() error {
 			err := w.Cloudflare.UpdateA(rec.ID, host, w.CurrentIP)
 			if err != nil {
 				logger.Error(err.Error())
+				continue
 			}
+
+			go w.setIP(host, w.CurrentIP)
+			go w.notify(host, parsedContent.String(), w.CurrentIP.String())
 			continue
 		}
 
@@ -214,4 +223,27 @@ func (w *Worker) checkHosts() error {
 	}
 
 	return nil
+}
+
+func (w *Worker) setIP(host string, newIP net.IP) {
+	rec, ok := w.HostMap[host]
+	if !ok {
+		w.getDNSRecords()
+
+		rec, ok = w.HostMap[host]
+		if !ok {
+			return
+		}
+	}
+
+	rec.Content = newIP.String()
+	w.HostMap[host] = rec
+}
+
+func (w *Worker) notify(host string, oldIP string, newIP string) {
+	ifttt := notifier.IFTTT{V1: host, V2: oldIP, V3: newIP}
+	err := ifttt.Notify()
+	if err != nil {
+		logger.Error(err.Error())
+	}
 }
