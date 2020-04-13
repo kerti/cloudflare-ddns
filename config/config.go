@@ -24,6 +24,9 @@ func Load(optConfig *string) error {
 	viper.SetDefault("resolver.noVerify", true)
 	viper.SetDefault("worker.checkInterval", 35)
 
+	viper.SetDefault("notifier.ifttt.webhook.active", false)
+	viper.SetDefault("notifier.ifttt.webhook.eventName", "cf_ddns_update")
+
 	/* read the config file */
 	err := viper.ReadInConfig()
 	if err != nil {

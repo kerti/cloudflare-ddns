@@ -69,3 +69,19 @@ worker:
   # With 35 seconds between checks, a resolver will be invoked at most once every 5 minutes.
   # This gives the fastest check interval without irresponsibly invoking any resolver.
   # checkInterval: 35
+
+# Notifier configuration
+notifier:
+  # If This Then That
+  ifttt:
+    # Maker Webhook
+    webhook:
+      # Set this to true to activate. Defaults to false.
+      # active: false
+      
+      # Your maker key. Login to IFTTT and go to https://ifttt.com/maker_webhooks/settings to get yours.
+      # There is no default.
+      # makerKey: <your-maker-key-here>
+      
+      # Your event type. Can be anything. Defaults to cf_ddns_update
+      # eventName: cf_ddns_update
