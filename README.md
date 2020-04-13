@@ -8,32 +8,45 @@
 
 Simple standalone DDNS updater using Cloudflare.
 
+# Providers
+
+Here's a list of providers that enable us to check our external IP address. To prevent bogging down a single server,
+we hit each one in a round-robin fashion and set the interval accordingly.
+
+| Service              | URL                           | Type |
+-----------------------|-------------------------------|------|
+| Big Data Cloud       | https://www.bigdatacloud.com  | JSON |
+| I Can Haz IP         | http://icanhazip.com          | Text |
+| Ifconfig Me          | https://ifconfig.me           | Text |
+| IP API               | https://ipapi.co              | Text |
+| IPify                | https://www.ipify.org         | Text |
+| My External IP       | https://myexternalip.com      | Text |
+| My IP                | https://www.myip.com          | JSON |
+| What's My IP Address | https://whatismyipaddress.com | Text |
+| WTF Is My IP         | https://wtfismyip.com         | Text |
+
+# Notifications
+
+## IFTTT
+
+You can use IFTTT to hook up this DNS updater to basically anything that IFTTT supports.
+
+* Sign in to [IFTTT](https://ifttt.com)
+* Create a new applet
+* Use Webhooks as the triggering service
+* Choose **Receive a web request**
+* Enter an event name
+* Choose the action service
+* Complete your setup
+* Set your IFTTT maker key in the config file
+
 # Roadmap
 
-- [x] Multiple provider support
-  - [x] Big Data Cloud
-  - [x] I Can Haz IP
-  - [x] Ifconfig Me
-  - [x] IP API
-  - [x] IPify
-  - [x] My External IP
-  - [x] My IP
-  - [x] What's My IP Address
-  - [x] WTF Is My IP
-  - [ ] and more...
-- [x] Round-robin checking
-- [x] Automatically create A records
-- [x] Automatically update A records
 - [ ] Simplify codebase
-  - [x] Use single class for simple IP lookup provider
   - [ ] Do away with cloudflare wrapper and just do it in worker
 - [ ] Do I need to do anything asynchronously?
-- [x] Optimize binary executable size
 - [ ] Notifiers
   - [ ] Email
-  - [ ] Telegram
   - [ ] and more...
-- [x] Code linter/vetter/checker
 - [ ] Unit tests
-- [x] Code coverage
-- [x] CI integration
+- [ ] Code coverage
