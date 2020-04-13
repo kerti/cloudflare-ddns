@@ -1,5 +1,29 @@
 #!/bin/bash
 
+MAJVERSION='0'
+MINVERSION='0'
+BUILDNUM=`git rev-parse --short HEAD`
+VERSUFFIX='rel'
+
+FULLVERSION="${MAJVERSION}.${MINVERSION}-${VERSUFFIX}-${BUILDNUM}"
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -M|--major=*)
+      MAJVERSION="${1#*=}"
+      ;;
+    -m|--minor=*)
+      MINVERSION="${1#*=}"
+	  ;;
+    *)
+      printf "***************************\n"
+      printf "* Error: Invalid argument: ${1}: ${1#*=}*\n"
+      printf "***************************\n"
+      exit 1
+  esac
+  shift
+done
+
 name='cloudflare-ddns'
 builddir='./build/release'
 
@@ -13,19 +37,12 @@ if hash upx 2>/dev/null; then
 	UPX=true
 fi
 
-MAJVERSION='0'
-MINVERSION='1'
-BUILDNUM=`git rev-parse --short HEAD`
-VERSUFFIX='rel'
-
-FULLVERSION="${MAJVERSION}.${MINVERSION}-${VERSUFFIX}-${BUILDNUM}"
-
-LDFLAGS="-X main.majVersion=$MAJVERSION -X main.minVersion=$MINVERSION -X main.buildNum=$BUILDNUM -X main.verSuffix=$VERSUFFIX -s -w -linkmode external -extldflags -static"
+LDFLAGS="-X main.majVersion=$MAJVERSION -X main.minVersion=$MINVERSION -X main.buildNum=$BUILDNUM -X main.verSuffix=$VERSUFFIX -s -w"
 GCFLAGS=""
 
 # X86
 # full list: windows linux darwin freebsd netbsd openbsd
-OSES=(windows linux darwin)
+OSES=(linux darwin)
 ARCHS=(amd64 386)
 mkdir -p ${builddir}
 rm -rf ${builddir}/*
@@ -34,7 +51,6 @@ for os in ${OSES[@]}; do
 		suffix=""
 		if [ "$os" == "windows" ]; then
 			suffix=".exe"
-			LDFLAGS="-X main.majVersion=$MAJVERSION -X main.minVersion=$MINVERSION -X main.buildNum=$BUILDNUM -X main.verSuffix=$VERSUFFIX -s -w"
 		fi
 		env CGO_ENABLED=0 GOOS=$os GOARCH=$arch go build -ldflags "$LDFLAGS" -gcflags "$GCFLAGS" -o ${builddir}/${name}_${os}_${arch}${suffix} .
 		if $UPX; then upx --ultra-brute ${builddir}/${name}_${os}_${arch}${suffix}; fi
@@ -44,7 +60,8 @@ for os in ${OSES[@]}; do
 done
 
 # ARM
-ARMS=(5 6 7 8)
+# full list: 5 6 7
+ARMS=(6 7)
 for v in ${ARMS[@]}; do
 	env CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=$v go build -ldflags "$LDFLAGS" -gcflags "$GCFLAGS" -o ${builddir}/${name}_arm$v .
 done
@@ -53,7 +70,6 @@ tar -C ${builddir} -zcf ${builddir}/${name}_arm-$FULLVERSION.tar.gz $(for v in $
 $MD5 ${builddir}/${name}_arm-$FULLVERSION.tar.gz
 
 # MIPS # go 1.8+ required
-LDFLAGS="-X main.majVersion=$MAJVERSION -X main.minVersion=$MINVERSION -X main.buildNum=$BUILDNUM -X main.verSuffix=$VERSUFFIX -s -w"
 env CGO_ENABLED=0 GOOS=linux GOARCH=mipsle go build -ldflags "$LDFLAGS" -gcflags "$GCFLAGS" -o ${builddir}/${name}_mipsle .
 env CGO_ENABLED=0 GOOS=linux GOARCH=mips go build -ldflags "$LDFLAGS" -gcflags "$GCFLAGS" -o ${builddir}/${name}_mips .
 

@@ -1,5 +1,29 @@
 #!/bin/bash
 
+MAJVERSION='0'
+MINVERSION='0'
+BUILDNUM=`git rev-parse --short HEAD`
+VERSUFFIX='dev'
+
+FULLVERSION="${MAJVERSION}.${MINVERSION}-${VERSUFFIX}-${BUILDNUM}"
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -M|--major=*)
+      MAJVERSION="${1#*=}"
+      ;;
+    -m|--minor=*)
+      MINVERSION="${1#*=}"
+	  ;;
+    *)
+      printf "***************************\n"
+      printf "* Error: Invalid argument: ${1}: ${1#*=}*\n"
+      printf "***************************\n"
+      exit 1
+  esac
+  shift
+done
+
 name='cloudflare-ddns'
 builddir='./build/dev'
 
@@ -13,14 +37,7 @@ if hash upx 2>/dev/null; then
 	UPX=true
 fi
 
-MAJVERSION='0'
-MINVERSION='1'
-BUILDNUM=`git rev-parse --short HEAD`
-VERSUFFIX='dev'
-
-FULLVERSION="${MAJVERSION}.${MINVERSION}-${VERSUFFIX}-${BUILDNUM}"
-
-LDFLAGS="-X main.majVersion=$MAJVERSION -X main.minVersion=$MINVERSION -X main.buildNum=$BUILDNUM -X main.verSuffix=$VERSUFFIX -s -w -linkmode external"
+LDFLAGS="-X main.majVersion=$MAJVERSION -X main.minVersion=$MINVERSION -X main.buildNum=$BUILDNUM -X main.verSuffix=$VERSUFFIX -s -w"
 GCFLAGS=""
 
 # X86
