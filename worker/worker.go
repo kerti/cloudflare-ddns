@@ -193,20 +193,7 @@ func (w *Worker) checkHosts() error {
 		}
 
 		parsedContent := net.ParseIP(rec.Content)
-		if parsedContent == nil {
-			logger.Debug("[WORKER] Host [%s] has invalid IP address, setting...", host)
-			err := w.Cloudflare.UpdateA(rec.ID, host, w.CurrentIP)
-			if err != nil {
-				logger.Error(err.Error())
-				continue
-			}
-
-			go w.setIP(host, w.CurrentIP)
-			go w.notify(host, parsedContent.String(), w.CurrentIP.String())
-			continue
-		}
-
-		if parsedContent.String() != w.CurrentIP.String() {
+		if parsedContent == nil || parsedContent.String() != w.CurrentIP.String() {
 			logger.Debug("[WORKER] Host [%s] has different IP address, setting...", host)
 			err := w.Cloudflare.UpdateA(rec.ID, host, w.CurrentIP)
 			if err != nil {
