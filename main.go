@@ -56,12 +56,6 @@ func initialize() error {
 		return err
 	}
 
-	err = worker.CheckConfig()
-	if err != nil {
-		logger.Error(err.Error())
-		return err
-	}
-
 	return nil
 }
 

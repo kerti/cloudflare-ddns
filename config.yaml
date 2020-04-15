@@ -63,12 +63,11 @@ cloudflare:
 
 worker:
   # Check interval in seconds.
-  # Minimum: 10 (to prevent bursting a bunch of checks)
+  # Minimum: 300 / number of resolvers (minimum 5 minutes round interval)
   # Maximum: 4294967295 (uint32 max value)
-  # Defaults to 35, the reasoning being that there are currently 9 resolvers implemented.
-  # With 35 seconds between checks, a resolver will be invoked at most once every 5 minutes.
-  # This gives the fastest check interval without irresponsibly invoking any resolver.
-  # checkInterval: 35
+  # Recommended: auto (will automatically calculate optimum interval)
+  # Defaults to auto
+  # checkInterval: auto
 
 # Notifier configuration
 notifier:

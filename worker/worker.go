@@ -1,8 +1,9 @@
 package worker
 
 import (
-	"fmt"
+	"math"
 	"net"
+	"strconv"
 	"time"
 
 	cf "github.com/cloudflare/cloudflare-go"
@@ -13,27 +14,47 @@ import (
 	"github.com/spf13/viper"
 )
 
-// CheckConfig checks the worker configuration
-func CheckConfig() error {
-	checkInterval := viper.GetUint32("worker.checkInterval")
-	if checkInterval < 10 {
-		return fmt.Errorf("worker check interval cannot be set to under 10 seconds")
-	}
-	if checkInterval > 4294967295 {
-		return fmt.Errorf("worker check interval cannot be set to over 4294967295 seconds")
-	}
-	logger.Debug("[WORKER] Worker configuration OK.")
-	return nil
-}
-
 // Worker is the worker class
 type Worker struct {
+	Interval   int
 	Cloudflare cloudflare.Cloudflare
 	Resolvers  []resolver.Resolver
 	Counter    int
 	Hosts      []string
 	HostMap    map[string]cf.DNSRecord
 	CurrentIP  net.IP
+}
+
+func (w *Worker) initInterval() {
+	rslvLength := len(w.Resolvers)
+	if rslvLength <= 0 {
+		rslvLength = 1
+	}
+
+	checkIntervalStr := viper.GetString("worker.checkInterval")
+	checkIntervalInt, err := strconv.Atoi(checkIntervalStr)
+
+	if err != nil {
+		if checkIntervalStr != "auto" {
+			logger.Warn("Invalid check interval: [%s]", checkIntervalStr)
+			logger.Warn("Reverting to automatic check interval.")
+		}
+
+		w.Interval = int(math.Round(float64(300) / float64(rslvLength)))
+		logger.Info("Check interval automatically set at %d seconds.", w.Interval)
+	} else {
+		w.Interval = checkIntervalInt
+
+		// prevent invoking a provider more than once per minute
+		if rslvLength*checkIntervalInt < 300 {
+			w.Interval = int(math.Round(float64(300) / float64(rslvLength)))
+		}
+	}
+
+	// prevent checking more than twice per minute
+	if w.Interval < 30 {
+		w.Interval = 30
+	}
 }
 
 func (w *Worker) initProperties() error {
@@ -47,6 +68,9 @@ func (w *Worker) initProperties() error {
 
 	// initialize counter
 	w.Counter = 0
+
+	// initialize the interval
+	w.initInterval()
 
 	// initialize hosts
 	w.Hosts = viper.GetStringSlice("cloudflare.hostnames")
@@ -114,8 +138,7 @@ func (w *Worker) Run() error {
 		return err
 	}
 
-	checkInterval := viper.GetUint32("worker.checkInterval")
-	t := time.NewTicker(time.Duration(checkInterval) * time.Second)
+	t := time.NewTicker(time.Duration(w.Interval) * time.Second)
 	for range t.C {
 		err := w.check()
 		if err != nil {

@@ -22,7 +22,7 @@ func Load(optConfig *string) error {
 	/* set default config values */
 	viper.SetDefault("loglevel", 3)
 	viper.SetDefault("resolver.noVerify", true)
-	viper.SetDefault("worker.checkInterval", 35)
+	viper.SetDefault("worker.checkInterval", "auto")
 
 	viper.SetDefault("notifier.ifttt.webhook.active", false)
 	viper.SetDefault("notifier.ifttt.webhook.eventName", "cf_ddns_update")

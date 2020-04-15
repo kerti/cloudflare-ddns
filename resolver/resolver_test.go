@@ -234,10 +234,10 @@ func mockHTTPResponse(input string) *http.Response {
 func TestResolver(t *testing.T) {
 
 	logger.InitLogger(&initloglevel)
+	configFile := "../config.yaml"
+	config.Load(&configFile)
 
 	t.Run("Get", func(t *testing.T) {
-		configFile := "../config.yaml"
-		config.Load(&configFile)
 		res, err := Get()
 		assert.NotNil(t, res)
 		assert.NotEmpty(t, res)
