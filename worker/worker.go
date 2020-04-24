@@ -3,6 +3,7 @@ package worker
 import (
 	"math"
 	"net"
+	"os"
 	"strconv"
 	"time"
 
@@ -16,13 +17,25 @@ import (
 
 // Worker is the worker class
 type Worker struct {
-	Interval   int
+	// Interval is the interval between checks
+	Interval int
+	// Cloudflare is the Cloudflare client
 	Cloudflare cloudflare.Cloudflare
-	Resolvers  []resolver.Resolver
-	Counter    int
-	Hosts      []string
-	HostMap    map[string]cf.DNSRecord
-	CurrentIP  net.IP
+
+	// Resolvers is the collection of resolvers
+	Resolvers []resolver.Resolver
+
+	// Counter is the counter for the round-robin
+	Counter int
+
+	// Hosts is a list of hosts to be updated
+	Hosts []string
+
+	// HostMap is a map of existing hosts configured on Cloudflare
+	HostMap map[string]cf.DNSRecord
+
+	// CurrentIP is the current IP address as resolved by one of the resolvers
+	CurrentIP net.IP
 }
 
 func (w *Worker) initInterval() {
@@ -110,7 +123,8 @@ func (w *Worker) initExternal() error {
 	return nil
 }
 
-func (w *Worker) init() error {
+// Init initializes the worker
+func (w *Worker) Init() error {
 	// initialize properties
 	err := w.initProperties()
 	if err != nil {
@@ -132,13 +146,8 @@ func (w *Worker) init() error {
 
 // Run runs the worker
 func (w *Worker) Run() error {
-	err := w.init()
-	if err != nil {
-		logger.Error(err.Error())
-		return err
-	}
-
 	t := time.NewTicker(time.Duration(w.Interval) * time.Second)
+	defer t.Stop()
 	for range t.C {
 		err := w.check()
 		if err != nil {
@@ -147,6 +156,14 @@ func (w *Worker) Run() error {
 	}
 
 	return nil
+}
+
+// Stop stops the worker
+func (w *Worker) Stop() {
+	logger.Info("Interrupt detected, shutting down gracefully...")
+	// Do whatever you need to do here before exiting
+	logger.Info("Shutdown completed, exiting...")
+	os.Exit(0)
 }
 
 func (w *Worker) check() error {

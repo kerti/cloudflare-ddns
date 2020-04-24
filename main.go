@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 
 	"github.com/kerti/cloudflare-ddns/cloudflare"
 	"github.com/kerti/cloudflare-ddns/config"
@@ -67,9 +68,19 @@ func main() {
 	}
 
 	w := new(worker.Worker)
-	err = w.Run()
+	err = w.Init()
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		for range c {
+			w.Stop()
+		}
+	}()
+
+	w.Run()
 }
