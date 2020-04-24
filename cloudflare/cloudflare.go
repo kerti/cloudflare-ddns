@@ -50,8 +50,7 @@ func (c *Cloudflare) FetchA(host string) (result map[string]cf.DNSRecord, err er
 	logger.Debug("[CLOUDFLARE] Fetching A record for host [%v]", host)
 	records, err := c.cf.DNSRecords(c.zoneID, cf.DNSRecord{Name: host, Type: "A"})
 	if err != nil {
-		logger.Error(err.Error())
-		return
+		return nil, fmt.Errorf("failed fetching A record: %v", err.Error())
 	}
 
 	result = make(map[string]cf.DNSRecord)
@@ -74,8 +73,7 @@ func (c *Cloudflare) CreateA(name string, ip net.IP) (result cf.DNSRecord, err e
 
 	cfResponse, err := c.cf.CreateDNSRecord(c.zoneID, rr)
 	if err != nil {
-		logger.Error(err.Error())
-		return result, err
+		return result, fmt.Errorf("failed creating A record: %v", err.Error())
 	}
 
 	result = cfResponse.Result
