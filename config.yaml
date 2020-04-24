@@ -63,7 +63,8 @@ cloudflare:
 
 worker:
   # Check interval in seconds.
-  # Minimum: 300 / number of resolvers (minimum 5 minutes round interval)
+  # Calculated minimum: 300 / number of resolvers (minimum 5 minutes round interval)
+  # Absolute minimum: 30
   # Maximum: 4294967295 (uint32 max value)
   # Recommended: auto (will automatically calculate optimum interval)
   # Defaults to auto
