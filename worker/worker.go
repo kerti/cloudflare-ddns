@@ -19,6 +19,7 @@ import (
 type Worker struct {
 	// Interval is the interval between checks
 	Interval int
+
 	// Cloudflare is the Cloudflare client
 	Cloudflare cloudflare.Cloudflare
 
@@ -54,7 +55,6 @@ func (w *Worker) initInterval() {
 		}
 
 		w.Interval = int(math.Round(float64(300) / float64(rslvLength)))
-		logger.Info("Check interval automatically set at %d seconds.", w.Interval)
 	} else {
 		w.Interval = checkIntervalInt
 
@@ -68,6 +68,8 @@ func (w *Worker) initInterval() {
 	if w.Interval < 30 {
 		w.Interval = 30
 	}
+
+	logger.Info("Check interval set at %d seconds.", w.Interval)
 }
 
 func (w *Worker) initProperties() error {
@@ -172,9 +174,7 @@ func (w *Worker) check() error {
 		logger.Error(err.Error())
 	}
 
-	if w.Counter == len(w.Resolvers)-1 {
-		w.getDNSRecords()
-	}
+	w.getDNSRecords()
 
 	err = w.checkHosts()
 	if err != nil {
