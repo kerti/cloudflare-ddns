@@ -23,8 +23,14 @@ type Worker struct {
 	// Cloudflare is the Cloudflare client
 	Cloudflare cloudflare.Cloudflare
 
+	// CloudflareErrorCount is the counter for cloudflare errors
+	CloudflareErrorCount int
+
 	// Resolvers is the collection of resolvers
 	Resolvers []resolver.Resolver
+
+	// ResolverErrorCount is the counter for resolver errors
+	ResolverErrorCount int
 
 	// Counter is the counter for the round-robin
 	Counter int
@@ -101,41 +107,10 @@ func (w *Worker) initProperties() error {
 	return nil
 }
 
-func (w *Worker) initExternal() error {
-	// initialize hostmap
-	w.getDNSRecords()
-
-	// get current IP
-	rslv := w.Resolvers[len(w.Resolvers)-1]
-	currentIP, err := rslv.GetExternalIP()
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	w.CurrentIP = currentIP
-
-	// run first check on host list
-	if w.CurrentIP != nil {
-		err = w.checkHosts()
-		if err != nil {
-			logger.Error(err.Error())
-			return err
-		}
-	}
-
-	return nil
-}
-
 // Init initializes the worker
 func (w *Worker) Init() error {
 	// initialize properties
 	err := w.initProperties()
-	if err != nil {
-		logger.Error(err.Error())
-		return err
-	}
-
-	// initialize stuff requiring external connections
-	err = w.initExternal()
 	if err != nil {
 		logger.Error(err.Error())
 		return err
@@ -148,13 +123,13 @@ func (w *Worker) Init() error {
 
 // Run runs the worker
 func (w *Worker) Run() error {
+	w.check()
+
 	t := time.NewTicker(time.Duration(w.Interval) * time.Second)
 	defer t.Stop()
+
 	for range t.C {
-		err := w.check()
-		if err != nil {
-			logger.Error(err.Error())
-		}
+		w.check()
 	}
 
 	return nil
@@ -168,21 +143,24 @@ func (w *Worker) Stop() {
 	os.Exit(0)
 }
 
-func (w *Worker) check() error {
+func (w *Worker) check() {
 	err := w.getExternalIP()
 	if err != nil {
-		logger.Error(err.Error())
+		logger.Warn("failed resolving external IP, skipping check: %v", err.Error())
+		return
 	}
 
-	w.getDNSRecords()
+	err = w.getDNSRecords()
+	if err != nil {
+		logger.Warn("failed retrieving existing DNS records, skipping check: %v", err.Error())
+		return
+	}
 
 	err = w.checkHosts()
 	if err != nil {
-		logger.Error(err.Error())
-		return err
+		logger.Warn("failed checking hosts, skipping check: %v", err.Error())
+		return
 	}
-
-	return nil
 }
 
 func (w *Worker) getExternalIP() error {
@@ -195,7 +173,6 @@ func (w *Worker) getExternalIP() error {
 	w.Counter++
 
 	if err != nil {
-		logger.Error(err.Error())
 		return err
 	}
 
@@ -203,18 +180,20 @@ func (w *Worker) getExternalIP() error {
 	return nil
 }
 
-func (w *Worker) getDNSRecords() {
+func (w *Worker) getDNSRecords() (err error) {
 	w.HostMap = make(map[string]cf.DNSRecord)
 	for _, host := range w.Hosts {
 		hostmap, err := w.Cloudflare.FetchA(host)
 		if err != nil {
-			logger.Error(err.Error())
-			continue
+			logger.Warn(err.Error())
+			return err
 		}
 		for k, v := range hostmap {
 			w.HostMap[k] = v
 		}
 	}
+
+	return
 }
 
 func (w *Worker) checkHosts() error {

@@ -50,13 +50,11 @@ func (r *Resolver) Init() {
 func (r *Resolver) GetExternalIP() (net.IP, error) {
 	response, err := r.HTTPClient.Get(r.URL)
 	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
+		return nil, fmt.Errorf("failed resolving external IP: %v", err.Error())
 	}
 
 	if response == nil {
 		err = fmt.Errorf("response is nil")
-		logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -70,13 +68,11 @@ func (r *Resolver) GetExternalIP() (net.IP, error) {
 			return r.readIPJSON(*response)
 		default:
 			err = fmt.Errorf("unsupported resolver type: [%v]", r.Type)
-			logger.Error(err.Error())
 			return nil, err
 		}
 	}
 
 	err = fmt.Errorf("provider responded with HTTP/%v", response.StatusCode)
-	logger.Error(err.Error())
 	return nil, err
 }
 
